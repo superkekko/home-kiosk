@@ -1,0 +1,9 @@
+.env
+.git
+data
+raspberry
+dev
+app/node_modules
+app/public
+app/dev
+*.md

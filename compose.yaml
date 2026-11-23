@@ -1,0 +1,38 @@
+services:
+  kiosk-server:
+    build: .
+    container_name: kiosk-server
+    restart: unless-stopped   # riparte dopo il riavvio del NAS
+    init: true                # gestisce correttamente lo stop del container
+    network_mode: host        # raggiunge Home Assistant e il DSM sulla LAN (e dà rete
+                              # all'entrypoint, perché la rete di build non è usabile sul NAS)
+    environment:
+      - TZ=Europe/Rome
+      - PORT=${PORT:-8085}
+      - DATA_DIR=/data
+      # Home Assistant
+      - HA_URL=${HA_URL:-http://192.168.0.101:8123/api}
+      - HA_TOKEN=${HA_TOKEN:?imposta HA_TOKEN nel file .env}
+      - WEATHER_ENTITY_ID=${WEATHER_ENTITY_ID:-weather.forecast_casafb_am}
+      # Google Calendar
+      - CALENDAR_ID=${CALENDAR_ID:-}
+      # Synology Photos (dashboard Kindle); lasciare vuoto = sfondo grigio
+      - SYNO_URL=${SYNO_URL:-}
+      - SYNO_ACCOUNT=${SYNO_ACCOUNT:-}
+      - SYNO_PASSWORD=${SYNO_PASSWORD:-}
+      # Frequenza di rigenerazione (minuti) e cambio foto
+      - REFRESH_MINUTES_CALENDAR=${REFRESH_MINUTES_CALENDAR:-5}
+      - REFRESH_MINUTES_BIRTHDAY=${REFRESH_MINUTES_BIRTHDAY:-5}
+      - REFRESH_MINUTES_DASHBOARD=${REFRESH_MINUTES_DASHBOARD:-15}
+      - REFRESH_MINUTES_PHOTO=${REFRESH_MINUTES_PHOTO:-15}
+      - PHOTO_FIT=${PHOTO_FIT:-auto}
+      - PHOTO_EVERY_N_REFRESH=${PHOTO_EVERY_N_REFRESH:-1}
+    volumes:
+      # credentials.json, token.json, birthdays.json, birthday_images/, devices.json, sensors.json
+      - ./data:/data
+      - kiosk_node_modules:/usr/src/app/node_modules
+      - kiosk_state:/usr/src/app/.state
+
+volumes:
+  kiosk_node_modules:
+  kiosk_state:

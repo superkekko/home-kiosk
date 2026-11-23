@@ -1,0 +1,9 @@
+.env
+node_modules/
+app/public/
+.state/
+# segreti e dati personali (devices.json e sensors.json sono configurazione e si versionano)
+data/credentials.json
+data/token.json
+data/birthdays.json
+data/birthday_images/
